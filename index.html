@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -33,13 +34,11 @@ body {
     display: none !important;
 }
 
-
 .container {
     width: min(1100px, 92%);
     margin: 0 auto;
     padding: 48px 0 30px;
 }
-
 
 .topo {
     display: flex;
@@ -81,7 +80,6 @@ h1 span {
     gap: 10px;
 }
 
-
 .btn,
 .btn2 {
     display: inline-flex;
@@ -113,6 +111,33 @@ h1 span {
     color: var(--rosa-escuro);
 }
 
+#ordenar-btn {
+    width: 43px;
+    min-width: 43px;
+    padding: 0;
+}
+
+#ordenar-btn.ativo {
+    background: var(--rosa);
+    border-color: var(--rosa);
+    color: #432c36;
+}
+
+.icone-ordenar {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 19px;
+}
+
+.icone-ordenar span {
+    display: block;
+    width: 19px;
+    height: 2px;
+    border-radius: 2px;
+    background: currentColor;
+}
 
 .barra {
     display: flex;
@@ -146,7 +171,6 @@ h1 span {
     white-space: nowrap;
 }
 
-
 .biblioteca {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
@@ -154,11 +178,30 @@ h1 span {
 }
 
 .livro {
+    position: relative;
+    min-width: 0;
     transition: transform 0.2s;
 }
 
 .livro:hover {
     transform: translateY(-4px);
+}
+
+.livro.arrastavel {
+    cursor: grab;
+}
+
+.livro.arrastavel:active {
+    cursor: grabbing;
+}
+
+.livro.arrastando {
+    opacity: 0.4;
+}
+
+.livro.alvo-arrastar .capa {
+    outline: 2px solid var(--rosa);
+    outline-offset: 3px;
 }
 
 .capa {
@@ -194,7 +237,6 @@ h1 span {
     box-shadow: 0 12px 24px rgba(155, 82, 109, 0.25);
 }
 
-
 .livro h2 {
     display: -webkit-box;
     margin: 14px 0 4px;
@@ -217,7 +259,6 @@ h1 span {
     overflow-wrap: anywhere;
 }
 
-
 .acoes-livro {
     display: flex;
     flex-direction: column;
@@ -225,7 +266,6 @@ h1 span {
     gap: 8px;
     margin-top: 12px;
 }
-
 
 .baixar {
     padding: 0;
@@ -247,7 +287,6 @@ h1 span {
     cursor: wait;
 }
 
-
 .remover {
     margin-top: 10px;
     padding: 0;
@@ -259,6 +298,33 @@ h1 span {
     cursor: pointer;
 }
 
+.editar {
+    position: absolute;
+    top: 9px;
+    right: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 35px;
+    height: 35px;
+    padding: 0;
+    border: 1px solid rgba(240, 223, 230, 0.9);
+    border-radius: 10px;
+    background: rgba(255, 249, 251, 0.96);
+    color: var(--rosa-escuro);
+    cursor: pointer;
+    z-index: 2;
+}
+
+.editar:hover {
+    background: var(--rosa);
+    color: #432c36;
+}
+
+.editar svg {
+    width: 17px;
+    height: 17px;
+}
 
 .vazio {
     padding: 65px 20px;
@@ -285,7 +351,6 @@ h1 span {
     font-size: 13px;
 }
 
-
 #mensagem,
 #login-mensagem {
     min-height: 18px;
@@ -293,7 +358,6 @@ h1 span {
     font-size: 13px;
 }
 
-/* Formulário de login */
 .login {
     max-width: 420px;
     margin: 0 0 30px auto;
@@ -331,7 +395,6 @@ h1 span {
     margin-top: 16px;
 }
 
-
 @media (max-width: 650px) {
     .topo {
         flex-direction: column;
@@ -354,7 +417,6 @@ h1 span {
     }
 }
 </style>
-
 </head>
 <body>
 <main class="container">
@@ -366,9 +428,12 @@ h1 span {
     </div>
     <div class="acoes-topo">
       <button id="admin-btn" class="btn2" type="button">🔒 Entrar como administrador</button>
+      <button id="ordenar-btn" class="btn2" type="button" aria-label="Organizar livros" title="Organizar livros" hidden>
+        <span class="icone-ordenar"><span></span><span></span></span>
+      </button>
       <label id="adicionar-label" class="btn" for="arquivo-epub" hidden>+ Adicionar EPUB</label>
       <input id="arquivo-epub" type="file" accept=".epub,application/epub+zip" multiple hidden>
-      <button id="sair-btn" class="btn2" hidden>Sair</button>
+      <button id="sair-btn" class="btn2" type="button" hidden>Sair</button>
     </div>
   </header>
 
@@ -401,33 +466,45 @@ h1 span {
   </section>
 </main>
 
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-
-const SUPABASE_URL = 'https://yiugmagbrujejnwsghxr.supabase.co';    
-const SUPABASE_ANON_KEY = 'sb_publishable_ybzbXg3jJ5oJ65etqVKnPQ_lvgVE6U1'; 
-
+const SUPABASE_URL = 'https://yiugmagbrujejnwsghxr.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_ybzbXg3jJ5oJ65etqVKnPQ_lvgVE6U1';
 
 const $ = s => document.querySelector(s);
-const adminBtn = $('#admin-btn'), sairBtn = $('#sair-btn'), addLabel = $('#adicionar-label');
-const loginPainel = $('#login-painel'), loginForm = $('#login-form'), loginMsg = $('#login-mensagem');
-const msg = $('#mensagem'), pesquisa = $('#pesquisa'), inputArquivo = $('#arquivo-epub');
+const adminBtn = $('#admin-btn');
+const sairBtn = $('#sair-btn');
+const addLabel = $('#adicionar-label');
+const ordenarBtn = $('#ordenar-btn');
+const loginPainel = $('#login-painel');
+const loginForm = $('#login-form');
+const loginMsg = $('#login-mensagem');
+const msg = $('#mensagem');
+const pesquisa = $('#pesquisa');
+const inputArquivo = $('#arquivo-epub');
 
-let db = null, sessao = null, livros = [];
-
+let db = null;
+let sessao = null;
+let livros = [];
+let modoOrdenacao = false;
+let livroArrastadoId = null;
 
 adminBtn.addEventListener('click', () => {
   loginPainel.hidden = !loginPainel.hidden;
   loginMsg.textContent = '';
   if (!loginPainel.hidden) $('#email').focus();
 });
+
 $('#cancelar-login').addEventListener('click', fecharLogin);
-function fecharLogin() { loginPainel.hidden = true; loginForm.reset(); }
+
+function fecharLogin() {
+  loginPainel.hidden = true;
+  loginForm.reset();
+}
 
 try {
-    if (SUPABASE_URL.includes('COLE_') || SUPABASE_ANON_KEY.includes('COLE_')) {
+  if (SUPABASE_URL.includes('COLE_') || SUPABASE_ANON_KEY.includes('COLE_')) {
     msg.textContent = 'Erro 1: o index.html ainda está com COLE_AQUI. Preencha a URL e a chave, salve e publique de novo.';
   } else if (!/^https:\/\/[a-z0-9]+\.supabase\.co$/.test(SUPABASE_URL.trim())) {
     msg.textContent = 'Erro 2: a Project URL está errada. Deve ser só https://xxxx.supabase.co (sem / no final e sem /rest/v1).';
@@ -440,82 +517,170 @@ try {
   msg.textContent = 'Erro 4: a chave parece inválida. Use a Publishable key (sb_publishable_...). Detalhe: ' + e.message;
 }
 
-sairBtn.addEventListener('click', () => db && db.auth.signOut());
+sairBtn.addEventListener('click', () => {
+  if (db) db.auth.signOut();
+});
 
 loginForm.addEventListener('submit', async ev => {
   ev.preventDefault();
-  if (!db) { loginMsg.textContent = 'Site sem configuração do Supabase.'; return; }
+
+  if (!db) {
+    loginMsg.textContent = 'Site sem configuração do Supabase.';
+    return;
+  }
+
   loginMsg.textContent = 'Entrando...';
+
   const { error } = await db.auth.signInWithPassword({
     email: $('#email').value.trim(),
     password: $('#senha').value
   });
-  if (error) loginMsg.textContent = 'Não foi possível entrar. Confira e-mail e senha.';
-  else fecharLogin();
+
+  if (error) {
+    loginMsg.textContent = 'Não foi possível entrar. Confira e-mail e senha.';
+  } else {
+    fecharLogin();
+  }
 });
 
 pesquisa.addEventListener('input', desenhar);
 
+ordenarBtn.addEventListener('click', () => {
+  if (!sessao) return;
+
+  modoOrdenacao = !modoOrdenacao;
+  ordenarBtn.classList.toggle('ativo', modoOrdenacao);
+  ordenarBtn.title = modoOrdenacao ? 'Concluir organização' : 'Organizar livros';
+  ordenarBtn.setAttribute('aria-label', ordenarBtn.title);
+
+  if (modoOrdenacao) {
+    pesquisa.value = '';
+    msg.textContent = 'Arraste os livros para organizar. A ordem será salva automaticamente.';
+  } else {
+    msg.textContent = '';
+  }
+
+  desenhar();
+});
+
 async function iniciar() {
-  if (!db) { desenhar(); return; }
+  if (!db) {
+    desenhar();
+    return;
+  }
+
   const { data } = await db.auth.getSession();
   sessao = data.session;
+
   atualizarBotoes();
   await carregar();
-  db.auth.onAuthStateChange((_e, s) => { sessao = s; atualizarBotoes(); desenhar(); });
+
+  db.auth.onAuthStateChange((_e, s) => {
+    sessao = s;
+    modoOrdenacao = false;
+    atualizarBotoes();
+    desenhar();
+    carregar();
+  });
 }
 
 function atualizarBotoes() {
   const logado = Boolean(sessao);
+
   adminBtn.hidden = logado;
   sairBtn.hidden = !logado;
   addLabel.hidden = !logado;
+  ordenarBtn.hidden = !logado;
+
+  if (!logado) {
+    modoOrdenacao = false;
+    ordenarBtn.classList.remove('ativo');
+  }
 }
 
 async function carregar() {
+  if (!db) return;
+
   const { data, error } = await db.from('books')
-    .select('id, title, author, cover_url, file_name, epub_path, created_at')
+    .select('id, title, author, cover_url, file_name, epub_path, created_at, sort_order')
+    .order('sort_order', { ascending: true, nullsFirst: false })
     .order('created_at', { ascending: false });
-  if (error) { msg.textContent = 'Não foi possível carregar os livros. Confira se o SQL foi executado.'; return; }
+
+  if (error) {
+    msg.textContent = 'Não foi possível carregar os livros. Confira se o SQL foi executado e se a coluna sort_order existe.';
+    return;
+  }
+
   livros = data || [];
-  msg.textContent = '';
   desenhar();
 }
 
 inputArquivo.addEventListener('change', async () => {
   const arquivos = Array.from(inputArquivo.files || []);
-  if (!sessao) { msg.textContent = 'Entre como administrador para adicionar livros.'; inputArquivo.value = ''; return; }
+
+  if (!sessao) {
+    msg.textContent = 'Entre como administrador para adicionar livros.';
+    inputArquivo.value = '';
+    return;
+  }
+
   let falhou = false;
+
   for (const arq of arquivos) {
-    if (!arq.name.toLowerCase().endsWith('.epub')) { msg.textContent = 'Selecione arquivos EPUB.'; falhou = true; continue; }
+    if (!arq.name.toLowerCase().endsWith('.epub')) {
+      msg.textContent = 'Selecione arquivos EPUB.';
+      falhou = true;
+      continue;
+    }
+
     try {
       msg.textContent = `Lendo ${arq.name}...`;
+
       const meta = await lerEpub(arq);
       const id = crypto.randomUUID();
       const caminho = `${id}.epub`;
-      const up = await db.storage.from('epubs').upload(caminho, arq, { contentType: 'application/epub+zip', upsert: false });
+
+      const up = await db.storage.from('epubs').upload(caminho, arq, {
+        contentType: 'application/epub+zip',
+        upsert: false
+      });
+
       if (up.error) throw up.error;
 
       let capaUrl = null;
+
       if (meta.capaBlob) {
         const cc = `${id}.${meta.capaExt}`;
-        const r = await db.storage.from('covers').upload(cc, meta.capaBlob, { contentType: meta.capaBlob.type || 'image/jpeg', upsert: false });
-        if (!r.error) capaUrl = db.storage.from('covers').getPublicUrl(cc).data.publicUrl;
+        const r = await db.storage.from('covers').upload(cc, meta.capaBlob, {
+          contentType: meta.capaBlob.type || 'image/jpeg',
+          upsert: false
+        });
+
+        if (!r.error) {
+          capaUrl = db.storage.from('covers').getPublicUrl(cc).data.publicUrl;
+        }
       }
+
       const ins = await db.from('books').insert({
-        title: meta.titulo, author: meta.autor, cover_url: capaUrl, file_name: arq.name, epub_path: caminho
+        title: meta.titulo,
+        author: meta.autor,
+        cover_url: capaUrl,
+        file_name: arq.name,
+        epub_path: caminho
       });
+
       if (ins.error) throw ins.error;
     } catch (e) {
       falhou = true;
       msg.textContent = `Erro ao adicionar ${arq.name}. Confira o banco, o armazenamento e as políticas.`;
     }
   }
+
   await carregar();
   inputArquivo.value = '';
+
   if (!falhou) msg.textContent = '';
 });
-
 
 async function lerEpub(arq) {
   const zip = await JSZip.loadAsync(arq);
@@ -523,10 +688,9 @@ async function lerEpub(arq) {
 
   if (!cont) throw new Error('EPUB inválido');
 
-  const parse = t =>
-    new DOMParser().parseFromString(t, 'application/xml');
-
+  const parse = t => new DOMParser().parseFromString(t, 'application/xml');
   const container = parse(await cont.async('text'));
+
   const opfPath = container
     .getElementsByTagNameNS('*', 'rootfile')[0]
     ?.getAttribute('full-path');
@@ -591,6 +755,7 @@ async function lerEpub(arq) {
     } catch (_) {}
 
     const partes = [];
+
     for (const p of (base + href).split('/')) {
       if (!p || p === '.') continue;
       if (p === '..') partes.pop();
@@ -602,6 +767,7 @@ async function lerEpub(arq) {
 
     if (arquivoCapa) {
       const ext = caminho.split('.').pop().toLowerCase();
+
       const tipos = {
         jpg: 'image/jpeg',
         jpeg: 'image/jpeg',
@@ -611,7 +777,6 @@ async function lerEpub(arq) {
       };
 
       capaExt = ext === 'jpeg' ? 'jpg' : ext;
-
       capaBlob = await arquivoCapa.async('blob');
 
       if (tipos[ext]) {
@@ -623,38 +788,128 @@ async function lerEpub(arq) {
   return { titulo, autor, capaBlob, capaExt };
 }
 
-
 function resolver(base, c) {
   const r = [];
+
   for (const p of (base + c).split('/')) {
     if (!p || p === '.') continue;
-    if (p === '..') r.pop(); else r.push(p);
+    if (p === '..') r.pop();
+    else r.push(p);
   }
+
   return r.join('/');
 }
 
 function desenhar() {
   const termo = pesquisa.value.trim().toLocaleLowerCase('pt-BR');
-  const lista = livros.filter(l => `${l.title} ${l.author}`.toLocaleLowerCase('pt-BR').includes(termo));
+
+  const lista = livros.filter(l =>
+    `${l.title} ${l.author}`.toLocaleLowerCase('pt-BR').includes(termo)
+  );
+
   const bib = $('#biblioteca');
   bib.replaceChildren();
+
   for (const l of lista) {
     const card = document.createElement('article');
     card.className = 'livro';
+    card.dataset.id = l.id;
+
+    if (sessao && modoOrdenacao) {
+      card.draggable = true;
+      card.classList.add('arrastavel');
+
+      card.addEventListener('dragstart', ev => {
+        livroArrastadoId = l.id;
+        card.classList.add('arrastando');
+
+        if (ev.dataTransfer) {
+          ev.dataTransfer.effectAllowed = 'move';
+          ev.dataTransfer.setData('text/plain', String(l.id));
+        }
+      });
+
+      card.addEventListener('dragend', () => {
+        livroArrastadoId = null;
+
+        bib.querySelectorAll('.livro').forEach(c => {
+          c.classList.remove('arrastando', 'alvo-arrastar');
+        });
+      });
+
+      card.addEventListener('dragover', ev => {
+        ev.preventDefault();
+
+        if (livroArrastadoId !== l.id) {
+          card.classList.add('alvo-arrastar');
+
+          if (ev.dataTransfer) {
+            ev.dataTransfer.dropEffect = 'move';
+          }
+        }
+      });
+
+      card.addEventListener('dragleave', ev => {
+        if (!card.contains(ev.relatedTarget)) {
+          card.classList.remove('alvo-arrastar');
+        }
+      });
+
+      card.addEventListener('drop', async ev => {
+        ev.preventDefault();
+        card.classList.remove('alvo-arrastar');
+
+        const idOrigem = livroArrastadoId;
+        const idDestino = l.id;
+
+        if (idOrigem == null || idOrigem === idDestino) return;
+
+        const indiceOrigem = livros.findIndex(item => String(item.id) === String(idOrigem));
+        const indiceDestino = livros.findIndex(item => String(item.id) === String(idDestino));
+
+        if (indiceOrigem < 0 || indiceDestino < 0) return;
+
+        const [movido] = livros.splice(indiceOrigem, 1);
+        livros.splice(indiceDestino, 0, movido);
+
+        desenhar();
+        await salvarOrdem();
+      });
+    }
+
     const capa = document.createElement('div');
     capa.className = 'capa';
+
     if (l.cover_url) {
       const img = document.createElement('img');
-      img.src = l.cover_url; img.alt = `Capa de ${l.title}`;
+      img.src = l.cover_url;
+      img.alt = `Capa de ${l.title}`;
       capa.appendChild(img);
     } else {
       const fb = document.createElement('div');
-      fb.className = 'capa-fallback'; fb.textContent = l.title;
+      fb.className = 'capa-fallback';
+      fb.textContent = l.title;
       capa.appendChild(fb);
     }
-    const h = document.createElement('h2'); h.textContent = l.title;
-    const p = document.createElement('p'); p.textContent = l.author || 'Autor desconhecido';
+
+    const h = document.createElement('h2');
+    h.textContent = l.title;
+
+    const p = document.createElement('p');
+    p.textContent = l.author || 'Autor desconhecido';
+
     card.append(capa, h, p);
+
+    if (sessao) {
+      const editar = document.createElement('button');
+      editar.className = 'editar';
+      editar.type = 'button';
+      editar.title = 'Editar livro';
+      editar.setAttribute('aria-label', `Editar ${l.title}`);
+      editar.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L9 17l-4 1 1-4Z"/></svg>';
+      editar.addEventListener('click', () => editarLivro(l));
+      card.appendChild(editar);
+    }
 
     const acoes = document.createElement('div');
     acoes.className = 'acoes-livro';
@@ -677,16 +932,97 @@ function desenhar() {
 
     card.appendChild(acoes);
     bib.appendChild(card);
-
   }
+
   $('#contador').textContent = `${livros.length} ${livros.length === 1 ? 'livro' : 'livros'}`;
+
   const vazio = $('#vazio');
   vazio.hidden = lista.length > 0;
+
   const buscando = lista.length === 0 && livros.length > 0;
-  vazio.querySelector('h2').textContent = buscando ? 'Nenhum livro encontrado' : 'Sua biblioteca está vazia';
-  vazio.querySelector('p').textContent = buscando ? 'Tente outro título ou autor.' : 'Os livros adicionados aparecerão aqui.';
+
+  vazio.querySelector('h2').textContent = buscando
+    ? 'Nenhum livro encontrado'
+    : 'Sua biblioteca está vazia';
+
+  vazio.querySelector('p').textContent = buscando
+    ? 'Tente outro título ou autor.'
+    : 'Os livros adicionados aparecerão aqui.';
 }
 
+async function editarLivro(l) {
+  if (!sessao) return;
+
+  const titulo = prompt('Nome do livro:', l.title);
+
+  if (titulo === null) return;
+
+  if (!titulo.trim()) {
+    msg.textContent = 'O nome do livro não pode ficar vazio.';
+    return;
+  }
+
+  const autor = prompt('Nome do autor:', l.author || '');
+
+  if (autor === null) return;
+
+  if (!autor.trim()) {
+    msg.textContent = 'O nome do autor não pode ficar vazio.';
+    return;
+  }
+
+  msg.textContent = 'Salvando alterações...';
+
+  const { data, error } = await db.from('books')
+    .update({
+      title: titulo.trim(),
+      author: autor.trim()
+    })
+    .eq('id', l.id)
+    .select('id');
+
+  if (error || !data || data.length === 0) {
+    msg.textContent = 'Não foi possível editar o livro. Confira as políticas de acesso do Supabase.';
+    return;
+  }
+
+  l.title = titulo.trim();
+  l.author = autor.trim();
+
+  desenhar();
+  msg.textContent = 'Livro atualizado com sucesso!';
+}
+
+async function salvarOrdem() {
+  if (!sessao || !db) return;
+
+  msg.textContent = 'Salvando ordem dos livros...';
+
+  const resultados = await Promise.all(
+    livros.map((l, indice) =>
+      db.from('books')
+        .update({ sort_order: indice })
+        .eq('id', l.id)
+        .select('id')
+    )
+  );
+
+  const falha = resultados.some(r =>
+    r.error || !r.data || r.data.length === 0
+  );
+
+  if (falha) {
+    msg.textContent = 'Não foi possível salvar a ordem. Confira a coluna sort_order e as políticas de acesso do Supabase.';
+    await carregar();
+    return;
+  }
+
+  livros.forEach((l, indice) => {
+    l.sort_order = indice;
+  });
+
+  msg.textContent = 'Ordem dos livros salva!';
+}
 
 async function baixarLivro(l, botao) {
   if (!db) {
@@ -705,14 +1041,12 @@ async function baixarLivro(l, botao) {
   botao.textContent = 'Preparando download...';
 
   try {
-
     const nomeLimpo = (l.title || 'Livro')
       .replace(/[\\/:*?"<>|]/g, '-')
       .replace(/\s+/g, ' ')
       .trim();
 
     const nomeArquivo = `${nomeLimpo || 'Livro'}.epub`;
-
 
     const { data, error } = await db.storage
       .from('epubs')
@@ -726,10 +1060,8 @@ async function baixarLivro(l, botao) {
       throw new Error('O Supabase não retornou o link.');
     }
 
-
     const url = new URL(data.signedUrl);
     url.searchParams.set('download', nomeArquivo);
-
 
     const link = document.createElement('a');
     link.href = url.toString();
@@ -752,13 +1084,24 @@ async function baixarLivro(l, botao) {
 
 async function remover(l) {
   if (!sessao || !confirm(`Remover "${l.title}" da biblioteca?`)) return;
+
   const { error } = await db.from('books').delete().eq('id', l.id);
-  if (error) { msg.textContent = 'Não foi possível remover o livro.'; return; }
+
+  if (error) {
+    msg.textContent = 'Não foi possível remover o livro.';
+    return;
+  }
 
   try {
     await db.storage.from('epubs').remove([l.epub_path]);
-    if (l.cover_url) await db.storage.from('covers').remove([decodeURIComponent(l.cover_url.split('/covers/')[1] || '')]);
+
+    if (l.cover_url) {
+      await db.storage.from('covers').remove([
+        decodeURIComponent(l.cover_url.split('/covers/')[1] || '')
+      ]);
+    }
   } catch (e) {}
+
   await carregar();
 }
 
