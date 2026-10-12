@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minha Biblioteca</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{--fundo:#fff9fb;--rosa:#e8a8bd;--rosa-escuro:#9b526d;--texto:#46363d;--suave:#927e86;--borda:#f0dfe6;--branco:#fff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fundo);color:var(--texto);font-family:'DM Sans',sans-serif}
+[hidden]{display:none!important}
+.container{width:min(1100px,92%);margin:0 auto;padding:48px 0 30px}
+.topo{display:flex;justify-content:space-between;align-items:center;gap:24px;margin-bottom:38px}
+.subtitulo{margin:0 0 10px;color:var(--rosa-escuro);font-size:11px;font-weight:700;letter-spacing:2px}
+h1{margin:0;font-family:'Playfair Display',serif;font-size:clamp(30px,5vw,46px);font-weight:500}
+h1 span{color:var(--rosa)}
+.descricao{margin:12px 0 0;color:var(--suave);font-size:14px}
+.acoes-topo{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
+.btn,.btn2{display:inline-flex;align-items:center;justify-content:center;min-height:43px;padding:0 16px;border-radius:12px;font:inherit;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.btn{border:0;background:var(--rosa);color:#432c36}.btn:hover{background:#e29ab3}
+.btn2{border:1px solid var(--borda);background:var(--branco);color:var(--rosa-escuro)}
+.barra{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:28px}
+#pesquisa{width:min(440px,100%);min-height:44px;padding:0 15px;border:1px solid var(--borda);border-radius:12px;outline:none;background:#fff;color:var(--texto);font:inherit;font-size:13px}
+#pesquisa:focus,.login input:focus{border-color:var(--rosa)}
+#contador{color:var(--suave);font-size:13px;white-space:nowrap}
+.biblioteca{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:28px 20px}
+.capa{display:flex;align-items:center;justify-content:center;width:100%;aspect-ratio:2/3;overflow:hidden;border:1px solid var(--borda);border-radius:10px;background:#f5e6ec;color:var(--rosa-escuro)}
+.capa img{width:100%;height:100%;object-fit:cover}
+.capa-fallback{padding:18px;text-align:center;font-family:'Playfair Display',serif;font-size:21px;overflow-wrap:anywhere}
+.livro{transition:transform .2s}
+.livro:hover{transform:translateY(-4px)}
+.capa{box-shadow:0 6px 16px rgba(155,82,109,.15);transition:box-shadow .2s}
+.livro:hover .capa{box-shadow:0 12px 24px rgba(155,82,109,.25)}
+.livro h2{margin:14px 0 4px;font-family:'Playfair Display',serif;font-size:15px;font-weight:500;line-height:1.35;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.livro p{margin:0;color:var(--rosa-escuro);font-size:11px;letter-spacing:.5px;text-transform:uppercase;overflow-wrap:anywhere}
+.remover{margin-top:10px;padding:0;border:0;background:none;color:var(--rosa-escuro);font:inherit;font-size:12px;cursor:pointer}
+.vazio{padding:65px 20px;border:1px dashed #e7cbd6;border-radius:18px;text-align:center}
+.vazio .icone{color:var(--rosa);font-size:40px}
+.vazio h2{margin:12px 0 8px;font-family:'Playfair Display',serif;font-size:23px;font-weight:500}
+.vazio p{margin:0;color:var(--suave);font-size:13px}
+#mensagem,#login-mensagem{min-height:18px;color:var(--rosa-escuro);font-size:13px}
+.login{max-width:420px;margin:0 0 30px auto;padding:24px;border:1px solid var(--borda);border-radius:16px;background:#fff}
+.login h2{margin:0 0 18px;font-family:'Playfair Display',serif;font-weight:500}
+.login label{display:block;margin:12px 0 6px;font-size:12px}
+.login input{width:100%;min-height:42px;padding:0 12px;border:1px solid var(--borda);border-radius:10px;outline:none;font:inherit}
+.login-acoes{display:flex;gap:10px;margin-top:16px}
+@media(max-width:650px){.topo{flex-direction:column;align-items:stretch}.barra{flex-direction:column;align-items:stretch;gap:12px}#pesquisa{width:100%}.biblioteca{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 14px}}
+</style>
+</head>
+<body>
+<main class="container">
+  <header class="topo">
+    <div>
+      <p class="subtitulo">SUA BIBLIOTECA PARTICULAR</p>
+      <h1>Minha biblioteca <span>♡</span></h1>
+      <p class="descricao">Todos os seus livros em um só lugar.</p>
+    </div>
+    <div class="acoes-topo">
+      <button id="admin-btn" class="btn2" type="button">🔒 Entrar como administrador</button>
+      <label id="adicionar-label" class="btn" for="arquivo-epub" hidden>+ Adicionar EPUB</label>
+      <input id="arquivo-epub" type="file" accept=".epub,application/epub+zip" multiple hidden>
+      <button id="sair-btn" class="btn2" hidden>Sair</button>
+    </div>
+  </header>
+
+  <section id="login-painel" class="login" hidden>
+    <form id="login-form">
+      <h2>Entrar como administrador</h2>
+      <label for="email">E-mail</label>
+      <input id="email" type="email" autocomplete="username" required>
+      <label for="senha">Senha</label>
+      <input id="senha" type="password" autocomplete="current-password" required>
+      <div class="login-acoes">
+        <button class="btn" type="submit">Entrar</button>
+        <button id="cancelar-login" class="btn2" type="button">Cancelar</button>
+      </div>
+      <p id="login-mensagem" role="status"></p>
+    </form>
+  </section>
+
+  <section class="barra">
+    <input id="pesquisa" type="search" placeholder="Buscar por título ou autor..." aria-label="Buscar">
+    <span id="contador">0 livros</span>
+  </section>
+
+  <p id="mensagem" role="status"></p>
+  <section id="biblioteca" class="biblioteca"></section>
+  <section id="vazio" class="vazio" hidden>
+    <div class="icone">♡</div>
+    <h2>Sua biblioteca está vazia</h2>
+    <p>Os livros adicionados aparecerão aqui.</p>
+  </section>
+</main>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ============ PREENCHA AQUI (Supabase > Project Settings > API) ============ */
+const SUPABASE_URL = 'https://yiugmagbrujejnwsghxr.supabase.co';    
+const SUPABASE_ANON_KEY = 'sb_publishable_ybzbXg3jJ5oJ65etqVKnPQ_lvgVE6U1'; 
+/* ============================================================================ */
+
+const $ = s => document.querySelector(s);
+const adminBtn = $('#admin-btn'), sairBtn = $('#sair-btn'), addLabel = $('#adicionar-label');
+const loginPainel = $('#login-painel'), loginForm = $('#login-form'), loginMsg = $('#login-mensagem');
+const msg = $('#mensagem'), pesquisa = $('#pesquisa'), inputArquivo = $('#arquivo-epub');
+
+let db = null, sessao = null, livros = [];
+
+// Botões de login funcionam mesmo se a configuração estiver errada
+adminBtn.addEventListener('click', () => {
+  loginPainel.hidden = !loginPainel.hidden;
+  loginMsg.textContent = '';
+  if (!loginPainel.hidden) $('#email').focus();
+});
+$('#cancelar-login').addEventListener('click', fecharLogin);
+function fecharLogin() { loginPainel.hidden = true; loginForm.reset(); }
+
+try {
+    if (SUPABASE_URL.includes('COLE_') || SUPABASE_ANON_KEY.includes('COLE_')) {
+    msg.textContent = 'Erro 1: o index.html ainda está com COLE_AQUI. Preencha a URL e a chave, salve e publique de novo.';
+  } else if (!/^https:\/\/[a-z0-9]+\.supabase\.co$/.test(SUPABASE_URL.trim())) {
+    msg.textContent = 'Erro 2: a Project URL está errada. Deve ser só https://xxxx.supabase.co (sem / no final e sem /rest/v1).';
+  } else if (!window.supabase) {
+    msg.textContent = 'Erro 3: a biblioteca do Supabase não carregou. Confira a internet, desative bloqueadores e recarregue (Ctrl + F5).';
+  } else {
+    db = window.supabase.createClient(SUPABASE_URL.trim(), SUPABASE_ANON_KEY.trim());
+  }
+} catch (e) {
+  msg.textContent = 'Erro 4: a chave parece inválida. Use a Publishable key (sb_publishable_...). Detalhe: ' + e.message;
+}
+
+sairBtn.addEventListener('click', () => db && db.auth.signOut());
+
+loginForm.addEventListener('submit', async ev => {
+  ev.preventDefault();
+  if (!db) { loginMsg.textContent = 'Site sem configuração do Supabase.'; return; }
+  loginMsg.textContent = 'Entrando...';
+  const { error } = await db.auth.signInWithPassword({
+    email: $('#email').value.trim(),
+    password: $('#senha').value
+  });
+  if (error) loginMsg.textContent = 'Não foi possível entrar. Confira e-mail e senha.';
+  else fecharLogin();
+});
+
+pesquisa.addEventListener('input', desenhar);
+
+async function iniciar() {
+  if (!db) { desenhar(); return; }
+  const { data } = await db.auth.getSession();
+  sessao = data.session;
+  atualizarBotoes();
+  await carregar();
+  db.auth.onAuthStateChange((_e, s) => { sessao = s; atualizarBotoes(); desenhar(); });
+}
+
+function atualizarBotoes() {
+  const logado = Boolean(sessao);
+  adminBtn.hidden = logado;
+  sairBtn.hidden = !logado;
+  addLabel.hidden = !logado;
+}
+
+async function carregar() {
+  const { data, error } = await db.from('books')
+    .select('id, title, author, cover_url, file_name, epub_path, created_at')
+    .order('created_at', { ascending: false });
+  if (error) { msg.textContent = 'Não foi possível carregar os livros. Confira se o SQL foi executado.'; return; }
+  livros = data || [];
+  msg.textContent = '';
+  desenhar();
+}
+
+inputArquivo.addEventListener('change', async () => {
+  const arquivos = Array.from(inputArquivo.files || []);
+  if (!sessao) { msg.textContent = 'Entre como administrador para adicionar livros.'; inputArquivo.value = ''; return; }
+  let falhou = false;
+  for (const arq of arquivos) {
+    if (!arq.name.toLowerCase().endsWith('.epub')) { msg.textContent = 'Selecione arquivos EPUB.'; falhou = true; continue; }
+    try {
+      msg.textContent = `Lendo ${arq.name}...`;
+      const meta = await lerEpub(arq);
+      const id = crypto.randomUUID();
+      const caminho = `${id}.epub`;
+      const up = await db.storage.from('epubs').upload(caminho, arq, { contentType: 'application/epub+zip', upsert: false });
+      if (up.error) throw up.error;
+
+      let capaUrl = null;
+      if (meta.capaBlob) {
+        const cc = `${id}.${meta.capaExt}`;
+        const r = await db.storage.from('covers').upload(cc, meta.capaBlob, { contentType: meta.capaBlob.type || 'image/jpeg', upsert: false });
+        if (!r.error) capaUrl = db.storage.from('covers').getPublicUrl(cc).data.publicUrl;
+      }
+      const ins = await db.from('books').insert({
+        title: meta.titulo, author: meta.autor, cover_url: capaUrl, file_name: arq.name, epub_path: caminho
+      });
+      if (ins.error) throw ins.error;
+    } catch (e) {
+      falhou = true;
+      msg.textContent = `Erro ao adicionar ${arq.name}. Confira o banco, o armazenamento e as políticas.`;
+    }
+  }
+  await carregar();
+  inputArquivo.value = '';
+  if (!falhou) msg.textContent = '';
+});
+
+
+async function lerEpub(arq) {
+  const zip = await JSZip.loadAsync(arq);
+  const cont = zip.file('META-INF/container.xml');
+
+  if (!cont) throw new Error('EPUB inválido');
+
+  const parse = t =>
+    new DOMParser().parseFromString(t, 'application/xml');
+
+  const container = parse(await cont.async('text'));
+  const opfPath = container
+    .getElementsByTagNameNS('*', 'rootfile')[0]
+    ?.getAttribute('full-path');
+
+  if (!opfPath || !zip.file(opfPath)) {
+    throw new Error('Sem metadados do EPUB');
+  }
+
+  const opf = parse(await zip.file(opfPath).async('text'));
+
+  const tag = n =>
+    (opf.getElementsByTagNameNS('*', n)[0] ||
+     opf.getElementsByTagName(n)[0])
+      ?.textContent?.trim() || '';
+
+  const titulo = tag('title') ||
+    arq.name.replace(/\.epub$/i, '').replace(/[_-]+/g, ' ');
+
+  const autor = tag('creator') || 'Autor desconhecido';
+
+  const itens = Array.from(opf.getElementsByTagNameNS('*', 'item'));
+  const metas = Array.from(opf.getElementsByTagNameNS('*', 'meta'));
+
+  const metaCapa = metas.find(
+    m => (m.getAttribute('name') || '').toLowerCase() === 'cover'
+  );
+
+  let item = metaCapa
+    ? itens.find(i => i.getAttribute('id') === metaCapa.getAttribute('content'))
+    : null;
+
+  if (!item) {
+    item = itens.find(i =>
+      (i.getAttribute('properties') || '')
+        .split(/\s+/).includes('cover-image')
+    );
+  }
+
+  if (!item) {
+    item = itens.find(i =>
+      /cover|capa/i.test(
+        (i.getAttribute('id') || '') + ' ' +
+        (i.getAttribute('href') || '')
+      ) &&
+      (i.getAttribute('media-type') || '').startsWith('image/')
+    );
+  }
+
+  let capaBlob = null;
+  let capaExt = 'jpg';
+
+  if (item) {
+    const base = opfPath.includes('/')
+      ? opfPath.slice(0, opfPath.lastIndexOf('/') + 1)
+      : '';
+
+    let href = (item.getAttribute('href') || '')
+      .split('#')[0].split('?')[0];
+
+    try {
+      href = decodeURIComponent(href);
+    } catch (_) {}
+
+    const partes = [];
+    for (const p of (base + href).split('/')) {
+      if (!p || p === '.') continue;
+      if (p === '..') partes.pop();
+      else partes.push(p);
+    }
+
+    const caminho = partes.join('/');
+    const arquivoCapa = zip.file(caminho);
+
+    if (arquivoCapa) {
+      const ext = caminho.split('.').pop().toLowerCase();
+      const tipos = {
+        jpg: 'image/jpeg',
+        jpeg: 'image/jpeg',
+        png: 'image/png',
+        webp: 'image/webp',
+        gif: 'image/gif'
+      };
+
+      capaExt = ext === 'jpeg' ? 'jpg' : ext;
+
+      capaBlob = await arquivoCapa.async('blob');
+
+      if (tipos[ext]) {
+        capaBlob = new Blob([capaBlob], { type: tipos[ext] });
+      }
+    }
+  }
+
+  return { titulo, autor, capaBlob, capaExt };
+}
+
+
+function resolver(base, c) {
+  const r = [];
+  for (const p of (base + c).split('/')) {
+    if (!p || p === '.') continue;
+    if (p === '..') r.pop(); else r.push(p);
+  }
+  return r.join('/');
+}
+
+function desenhar() {
+  const termo = pesquisa.value.trim().toLocaleLowerCase('pt-BR');
+  const lista = livros.filter(l => `${l.title} ${l.author}`.toLocaleLowerCase('pt-BR').includes(termo));
+  const bib = $('#biblioteca');
+  bib.replaceChildren();
+  for (const l of lista) {
+    const card = document.createElement('article');
+    card.className = 'livro';
+    const capa = document.createElement('div');
+    capa.className = 'capa';
+    if (l.cover_url) {
+      const img = document.createElement('img');
+      img.src = l.cover_url; img.alt = `Capa de ${l.title}`;
+      capa.appendChild(img);
+    } else {
+      const fb = document.createElement('div');
+      fb.className = 'capa-fallback'; fb.textContent = l.title;
+      capa.appendChild(fb);
+    }
+    const h = document.createElement('h2'); h.textContent = l.title;
+    const p = document.createElement('p'); p.textContent = l.author || 'Autor desconhecido';
+    card.append(capa, h, p);
+    if (sessao) {
+      const b = document.createElement('button');
+      b.className = 'remover'; b.type = 'button'; b.textContent = 'Remover';
+      b.addEventListener('click', () => remover(l));
+      card.appendChild(b);
+    }
+    bib.appendChild(card);
+  }
+  $('#contador').textContent = `${livros.length} ${livros.length === 1 ? 'livro' : 'livros'}`;
+  const vazio = $('#vazio');
+  vazio.hidden = lista.length > 0;
+  const buscando = lista.length === 0 && livros.length > 0;
+  vazio.querySelector('h2').textContent = buscando ? 'Nenhum livro encontrado' : 'Sua biblioteca está vazia';
+  vazio.querySelector('p').textContent = buscando ? 'Tente outro título ou autor.' : 'Os livros adicionados aparecerão aqui.';
+}
+
+async function remover(l) {
+  if (!sessao || !confirm(`Remover "${l.title}" da biblioteca?`)) return;
+  const { error } = await db.from('books').delete().eq('id', l.id);
+  if (error) { msg.textContent = 'Não foi possível remover o livro.'; return; }
+  // limpa os arquivos (se falhar, não atrapalha)
+  try {
+    await db.storage.from('epubs').remove([l.epub_path]);
+    if (l.cover_url) await db.storage.from('covers').remove([decodeURIComponent(l.cover_url.split('/covers/')[1] || '')]);
+  } catch (e) {}
+  await carregar();
+}
+
+iniciar();
+</script>
+</body>
+</html>
