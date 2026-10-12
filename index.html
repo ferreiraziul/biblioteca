@@ -6,48 +6,356 @@
 <title>Minha Biblioteca</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@500&display=swap" rel="stylesheet">
+```css
 <style>
-:root{--fundo:#fff9fb;--rosa:#e8a8bd;--rosa-escuro:#9b526d;--texto:#46363d;--suave:#927e86;--borda:#f0dfe6;--branco:#fff}
-*{box-sizing:border-box}
-body{margin:0;background:var(--fundo);color:var(--texto);font-family:'DM Sans',sans-serif}
-[hidden]{display:none!important}
-.container{width:min(1100px,92%);margin:0 auto;padding:48px 0 30px}
-.topo{display:flex;justify-content:space-between;align-items:center;gap:24px;margin-bottom:38px}
-.subtitulo{margin:0 0 10px;color:var(--rosa-escuro);font-size:11px;font-weight:700;letter-spacing:2px}
-h1{margin:0;font-family:'Playfair Display',serif;font-size:clamp(30px,5vw,46px);font-weight:500}
-h1 span{color:var(--rosa)}
-.descricao{margin:12px 0 0;color:var(--suave);font-size:14px}
-.acoes-topo{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
-.btn,.btn2{display:inline-flex;align-items:center;justify-content:center;min-height:43px;padding:0 16px;border-radius:12px;font:inherit;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
-.btn{border:0;background:var(--rosa);color:#432c36}.btn:hover{background:#e29ab3}
-.btn2{border:1px solid var(--borda);background:var(--branco);color:var(--rosa-escuro)}
-.barra{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:28px}
-#pesquisa{width:min(440px,100%);min-height:44px;padding:0 15px;border:1px solid var(--borda);border-radius:12px;outline:none;background:#fff;color:var(--texto);font:inherit;font-size:13px}
-#pesquisa:focus,.login input:focus{border-color:var(--rosa)}
-#contador{color:var(--suave);font-size:13px;white-space:nowrap}
-.biblioteca{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:28px 20px}
-.capa{display:flex;align-items:center;justify-content:center;width:100%;aspect-ratio:2/3;overflow:hidden;border:1px solid var(--borda);border-radius:10px;background:#f5e6ec;color:var(--rosa-escuro)}
-.capa img{width:100%;height:100%;object-fit:cover}
-.capa-fallback{padding:18px;text-align:center;font-family:'Playfair Display',serif;font-size:21px;overflow-wrap:anywhere}
-.livro{transition:transform .2s}
-.livro:hover{transform:translateY(-4px)}
-.capa{box-shadow:0 6px 16px rgba(155,82,109,.15);transition:box-shadow .2s}
-.livro:hover .capa{box-shadow:0 12px 24px rgba(155,82,109,.25)}
-.livro h2{margin:14px 0 4px;font-family:'Playfair Display',serif;font-size:15px;font-weight:500;line-height:1.35;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.livro p{margin:0;color:var(--rosa-escuro);font-size:11px;letter-spacing:.5px;text-transform:uppercase;overflow-wrap:anywhere}
-.remover{margin-top:10px;padding:0;border:0;background:none;color:var(--rosa-escuro);font:inherit;font-size:12px;cursor:pointer}
-.vazio{padding:65px 20px;border:1px dashed #e7cbd6;border-radius:18px;text-align:center}
-.vazio .icone{color:var(--rosa);font-size:40px}
-.vazio h2{margin:12px 0 8px;font-family:'Playfair Display',serif;font-size:23px;font-weight:500}
-.vazio p{margin:0;color:var(--suave);font-size:13px}
-#mensagem,#login-mensagem{min-height:18px;color:var(--rosa-escuro);font-size:13px}
-.login{max-width:420px;margin:0 0 30px auto;padding:24px;border:1px solid var(--borda);border-radius:16px;background:#fff}
-.login h2{margin:0 0 18px;font-family:'Playfair Display',serif;font-weight:500}
-.login label{display:block;margin:12px 0 6px;font-size:12px}
-.login input{width:100%;min-height:42px;padding:0 12px;border:1px solid var(--borda);border-radius:10px;outline:none;font:inherit}
-.login-acoes{display:flex;gap:10px;margin-top:16px}
-@media(max-width:650px){.topo{flex-direction:column;align-items:stretch}.barra{flex-direction:column;align-items:stretch;gap:12px}#pesquisa{width:100%}.biblioteca{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 14px}}
+:root {
+    --fundo: #fff9fb;
+    --rosa: #e8a8bd;
+    --rosa-escuro: #9b526d;
+    --texto: #46363d;
+    --suave: #927e86;
+    --borda: #f0dfe6;
+    --branco: #fff;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--fundo);
+    color: var(--texto);
+    font-family: 'DM Sans', sans-serif;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+/* Layout principal */
+.container {
+    width: min(1100px, 92%);
+    margin: 0 auto;
+    padding: 48px 0 30px;
+}
+
+/* Cabeçalho */
+.topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 38px;
+}
+
+.subtitulo {
+    margin: 0 0 10px;
+    color: var(--rosa-escuro);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+h1 {
+    margin: 0;
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(30px, 5vw, 46px);
+    font-weight: 500;
+}
+
+h1 span {
+    color: var(--rosa);
+}
+
+.descricao {
+    margin: 12px 0 0;
+    color: var(--suave);
+    font-size: 14px;
+}
+
+.acoes-topo {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* Botões do cabeçalho */
+.btn,
+.btn2 {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 43px;
+    padding: 0 16px;
+    border-radius: 12px;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.btn {
+    border: 0;
+    background: var(--rosa);
+    color: #432c36;
+}
+
+.btn:hover {
+    background: #e29ab3;
+}
+
+.btn2 {
+    border: 1px solid var(--borda);
+    background: var(--branco);
+    color: var(--rosa-escuro);
+}
+
+/* Barra de pesquisa */
+.barra {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 28px;
+}
+
+#pesquisa {
+    width: min(440px, 100%);
+    min-height: 44px;
+    padding: 0 15px;
+    border: 1px solid var(--borda);
+    border-radius: 12px;
+    outline: none;
+    background: #fff;
+    color: var(--texto);
+    font: inherit;
+    font-size: 13px;
+}
+
+#pesquisa:focus,
+.login input:focus {
+    border-color: var(--rosa);
+}
+
+#contador {
+    color: var(--suave);
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+/* Grade de livros */
+.biblioteca {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+    gap: 28px 20px;
+}
+
+.livro {
+    transition: transform 0.2s;
+}
+
+.livro:hover {
+    transform: translateY(-4px);
+}
+
+/* Capas */
+.capa {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    overflow: hidden;
+    border: 1px solid var(--borda);
+    border-radius: 10px;
+    background: #f5e6ec;
+    color: var(--rosa-escuro);
+    box-shadow: 0 6px 16px rgba(155, 82, 109, 0.15);
+    transition: box-shadow 0.2s;
+}
+
+.capa img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.capa-fallback {
+    padding: 18px;
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 21px;
+    overflow-wrap: anywhere;
+}
+
+.livro:hover .capa {
+    box-shadow: 0 12px 24px rgba(155, 82, 109, 0.25);
+}
+
+/* Título e autor */
+.livro h2 {
+    display: -webkit-box;
+    margin: 14px 0 4px;
+    overflow: hidden;
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.livro p {
+    margin: 0;
+    color: var(--rosa-escuro);
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    overflow-wrap: anywhere;
+}
+
+/* Ações de cada livro */
+.acoes-livro {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+/* Botão de download */
+.baixar {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--rosa-escuro);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.baixar:hover {
+    text-decoration: underline;
+}
+
+.baixar:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+/* Botão de remover */
+.remover {
+    margin-top: 10px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--rosa-escuro);
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+/* Biblioteca vazia */
+.vazio {
+    padding: 65px 20px;
+    border: 1px dashed #e7cbd6;
+    border-radius: 18px;
+    text-align: center;
+}
+
+.vazio .icone {
+    color: var(--rosa);
+    font-size: 40px;
+}
+
+.vazio h2 {
+    margin: 12px 0 8px;
+    font-family: 'Playfair Display', serif;
+    font-size: 23px;
+    font-weight: 500;
+}
+
+.vazio p {
+    margin: 0;
+    color: var(--suave);
+    font-size: 13px;
+}
+
+/* Mensagens do site */
+#mensagem,
+#login-mensagem {
+    min-height: 18px;
+    color: var(--rosa-escuro);
+    font-size: 13px;
+}
+
+/* Formulário de login */
+.login {
+    max-width: 420px;
+    margin: 0 0 30px auto;
+    padding: 24px;
+    border: 1px solid var(--borda);
+    border-radius: 16px;
+    background: #fff;
+}
+
+.login h2 {
+    margin: 0 0 18px;
+    font-family: 'Playfair Display', serif;
+    font-weight: 500;
+}
+
+.login label {
+    display: block;
+    margin: 12px 0 6px;
+    font-size: 12px;
+}
+
+.login input {
+    width: 100%;
+    min-height: 42px;
+    padding: 0 12px;
+    border: 1px solid var(--borda);
+    border-radius: 10px;
+    outline: none;
+    font: inherit;
+}
+
+.login-acoes {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+/* Responsividade para celulares */
+@media (max-width: 650px) {
+    .topo {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .barra {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    #pesquisa {
+        width: 100%;
+    }
+
+    .biblioteca {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 24px 14px;
+    }
+}
 </style>
+```
 </head>
 <body>
 <main class="container">
@@ -348,13 +656,29 @@ function desenhar() {
     const h = document.createElement('h2'); h.textContent = l.title;
     const p = document.createElement('p'); p.textContent = l.author || 'Autor desconhecido';
     card.append(capa, h, p);
+
+    const acoes = document.createElement('div');
+    acoes.className = 'acoes-livro';
+
+    const baixar = document.createElement('button');
+    baixar.className = 'baixar';
+    baixar.type = 'button';
+    baixar.textContent = '↓ Baixar livro';
+    baixar.addEventListener('click', () => baixarLivro(l, baixar));
+    acoes.appendChild(baixar);
+
     if (sessao) {
       const b = document.createElement('button');
-      b.className = 'remover'; b.type = 'button'; b.textContent = 'Remover';
+      b.className = 'remover';
+      b.type = 'button';
+      b.textContent = 'Remover';
       b.addEventListener('click', () => remover(l));
-      card.appendChild(b);
+      acoes.appendChild(b);
     }
+
+    card.appendChild(acoes);
     bib.appendChild(card);
+
   }
   $('#contador').textContent = `${livros.length} ${livros.length === 1 ? 'livro' : 'livros'}`;
   const vazio = $('#vazio');
@@ -362,6 +686,69 @@ function desenhar() {
   const buscando = lista.length === 0 && livros.length > 0;
   vazio.querySelector('h2').textContent = buscando ? 'Nenhum livro encontrado' : 'Sua biblioteca está vazia';
   vazio.querySelector('p').textContent = buscando ? 'Tente outro título ou autor.' : 'Os livros adicionados aparecerão aqui.';
+}
+
+
+async function baixarLivro(l, botao) {
+  if (!db) {
+    msg.textContent = 'Não foi possível conectar ao Supabase.';
+    return;
+  }
+
+  if (!l.epub_path) {
+    msg.textContent = 'O arquivo EPUB deste livro não está cadastrado.';
+    return;
+  }
+
+  const textoOriginal = botao.textContent;
+
+  botao.disabled = true;
+  botao.textContent = 'Preparando download...';
+
+  try {
+
+    const nomeLimpo = (l.title || 'Livro')
+      .replace(/[\\/:*?"<>|]/g, '-')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    const nomeArquivo = `${nomeLimpo || 'Livro'}.epub`;
+
+
+    const { data, error } = await db.storage
+      .from('epubs')
+      .createSignedUrl(l.epub_path, 60, {
+        download: nomeArquivo
+      });
+
+    if (error) throw error;
+
+    if (!data?.signedUrl) {
+      throw new Error('O Supabase não retornou o link.');
+    }
+
+
+    const url = new URL(data.signedUrl);
+    url.searchParams.set('download', nomeArquivo);
+
+
+    const link = document.createElement('a');
+    link.href = url.toString();
+    link.download = nomeArquivo;
+    link.rel = 'noopener';
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    msg.textContent = 'Download iniciado!';
+  } catch (erro) {
+    console.error('Erro ao baixar livro:', erro);
+    msg.textContent = 'Falha no download. Confira o Console (F12).';
+  } finally {
+    botao.disabled = false;
+    botao.textContent = textoOriginal;
+  }
 }
 
 async function remover(l) {
