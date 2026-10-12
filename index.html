@@ -6,7 +6,7 @@
 <title>Minha Biblioteca</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@500&display=swap" rel="stylesheet">
-```css
+
 <style>
 :root {
     --fundo: #fff9fb;
@@ -33,14 +33,14 @@ body {
     display: none !important;
 }
 
-/* Layout principal */
+
 .container {
     width: min(1100px, 92%);
     margin: 0 auto;
     padding: 48px 0 30px;
 }
 
-/* Cabeçalho */
+
 .topo {
     display: flex;
     justify-content: space-between;
@@ -81,7 +81,7 @@ h1 span {
     gap: 10px;
 }
 
-/* Botões do cabeçalho */
+
 .btn,
 .btn2 {
     display: inline-flex;
@@ -113,7 +113,7 @@ h1 span {
     color: var(--rosa-escuro);
 }
 
-/* Barra de pesquisa */
+
 .barra {
     display: flex;
     align-items: center;
@@ -146,7 +146,7 @@ h1 span {
     white-space: nowrap;
 }
 
-/* Grade de livros */
+
 .biblioteca {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
@@ -161,7 +161,6 @@ h1 span {
     transform: translateY(-4px);
 }
 
-/* Capas */
 .capa {
     display: flex;
     align-items: center;
@@ -195,7 +194,7 @@ h1 span {
     box-shadow: 0 12px 24px rgba(155, 82, 109, 0.25);
 }
 
-/* Título e autor */
+
 .livro h2 {
     display: -webkit-box;
     margin: 14px 0 4px;
@@ -218,7 +217,7 @@ h1 span {
     overflow-wrap: anywhere;
 }
 
-/* Ações de cada livro */
+
 .acoes-livro {
     display: flex;
     flex-direction: column;
@@ -227,7 +226,7 @@ h1 span {
     margin-top: 12px;
 }
 
-/* Botão de download */
+
 .baixar {
     padding: 0;
     border: 0;
@@ -248,7 +247,7 @@ h1 span {
     cursor: wait;
 }
 
-/* Botão de remover */
+
 .remover {
     margin-top: 10px;
     padding: 0;
@@ -260,7 +259,7 @@ h1 span {
     cursor: pointer;
 }
 
-/* Biblioteca vazia */
+
 .vazio {
     padding: 65px 20px;
     border: 1px dashed #e7cbd6;
@@ -286,7 +285,7 @@ h1 span {
     font-size: 13px;
 }
 
-/* Mensagens do site */
+
 #mensagem,
 #login-mensagem {
     min-height: 18px;
@@ -332,7 +331,7 @@ h1 span {
     margin-top: 16px;
 }
 
-/* Responsividade para celulares */
+
 @media (max-width: 650px) {
     .topo {
         flex-direction: column;
@@ -355,7 +354,7 @@ h1 span {
     }
 }
 </style>
-```
+
 </head>
 <body>
 <main class="container">
@@ -406,10 +405,10 @@ h1 span {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-/* ============ PREENCHA AQUI (Supabase > Project Settings > API) ============ */
+
 const SUPABASE_URL = 'https://yiugmagbrujejnwsghxr.supabase.co';    
 const SUPABASE_ANON_KEY = 'sb_publishable_ybzbXg3jJ5oJ65etqVKnPQ_lvgVE6U1'; 
-/* ============================================================================ */
+
 
 const $ = s => document.querySelector(s);
 const adminBtn = $('#admin-btn'), sairBtn = $('#sair-btn'), addLabel = $('#adicionar-label');
@@ -418,7 +417,7 @@ const msg = $('#mensagem'), pesquisa = $('#pesquisa'), inputArquivo = $('#arquiv
 
 let db = null, sessao = null, livros = [];
 
-// Botões de login funcionam mesmo se a configuração estiver errada
+
 adminBtn.addEventListener('click', () => {
   loginPainel.hidden = !loginPainel.hidden;
   loginMsg.textContent = '';
@@ -755,7 +754,7 @@ async function remover(l) {
   if (!sessao || !confirm(`Remover "${l.title}" da biblioteca?`)) return;
   const { error } = await db.from('books').delete().eq('id', l.id);
   if (error) { msg.textContent = 'Não foi possível remover o livro.'; return; }
-  // limpa os arquivos (se falhar, não atrapalha)
+
   try {
     await db.storage.from('epubs').remove([l.epub_path]);
     if (l.cover_url) await db.storage.from('covers').remove([decodeURIComponent(l.cover_url.split('/covers/')[1] || '')]);
